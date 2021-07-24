@@ -147,7 +147,7 @@ def main():
                 
                 # Gets cropped image and saves cropped image
                 croppedImage = window[win_y1:win_y2, win_x1:win_x2]
-                cv2.imwrite("./Images/Cropped_Images/Layer{}_Row{}_Column{}.jpg".format(layer, rowNum, colNum), croppedImage)
+                cv2.imwrite("./Images/Cropped_Images/L{}_Row{}_Col{}.jpg".format(layer, rowNum, colNum), croppedImage)
                 
                 prev_y1 = y1
                 prev_x1 = x1

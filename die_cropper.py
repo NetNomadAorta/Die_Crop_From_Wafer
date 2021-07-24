@@ -8,8 +8,8 @@ import cv2
 
 # Example argument
 #   cd C:\Users\troya\.spyder-py3\Die_Crop_From_Wafer
-#   python run.py -f Images/Images_to_Scan/Original.jpg -c Images/Images_to_Compare_for_Cropping/train_2.jpg
-#   run test.py -f Images/Images_to_Scan/Original.jpg -c Images/Images_to_Compare_for_Cropping/train_2.jpg
+#   python die_cropper.py -f Images/Images_to_Scan/Original.jpg -c Images/Images_to_Compare_for_Cropping/train_2.jpg
+#   run die_cropper.py -f Images/Images_to_Scan/Original.jpg -c Images/Images_to_Compare_for_Cropping/train_2.jpg
 
 def pyramid(image, compareCrop, scale=1.5, minSize=(500, 500)):
     # yield the original image

@@ -25,7 +25,8 @@ def pyramid(image, compareCrop, scale=1.5, minSize=(500, 500)):
         
         # if the resized image does not meet the supplied minimum
         #     size, then stop constructing the pyramid
-        if image.shape[0] < minSize[1] or image.shape[1] < minSize[0]:
+        if image.shape[0] < minSize[1] or image.shape[1] < minSize[0] \
+            or compareCrop.shape[0] < minSize[1] or compareCrop.shape[1] < minSize[0]:
             break
         
         # yield the next image in the pyramid
@@ -147,7 +148,7 @@ def main():
                 
                 # Gets cropped image and saves cropped image
                 croppedImage = window[win_y1:win_y2, win_x1:win_x2]
-                cv2.imwrite("./Images/Cropped_Images/L{}_Row{}_Col{}.jpg".format(layer, rowNum, colNum), croppedImage)
+                cv2.imwrite("./Images/Cropped_Images/L{}-Row_{}-Col_{}.jpg".format(layer, rowNum, colNum), croppedImage)
                 
                 prev_y1 = y1
                 prev_x1 = x1

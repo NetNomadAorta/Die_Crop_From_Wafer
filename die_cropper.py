@@ -87,11 +87,11 @@ def main():
     image = cv2.imread(args["full"])
     compareCrop = cv2.imread(args["compareCrops"])
     
-    windowSizeFraction = 0.15 # What fraction of full image the window should be
-    stepSizeFraction = 0.05 # What fraction of full image the window should step by
+    windowSizeFraction = 0.05 # What fraction of full image the window should be
+    stepSizeFraction = 0.03 # What fraction of full image the window should step by
     
     # Predefine next for loop's parameters 
-    layer = 0
+    layer = 0 # Layer of resolution-downscaled
     
     # loop over the image pyramid
     for (resized, resizedCrop) in pyramid(image, compareCrop, scale=1.5):
@@ -112,10 +112,6 @@ def main():
             # if the window does not meet our desired window size, ignore it
             if window.shape[0] != winH or window.shape[1] != winW:
                 continue
-    
-            # THIS IS WHERE YOU WOULD PROCESS YOUR WINDOW, SUCH AS APPLYING A
-            # MACHINE LEARNING CLASSIFIER TO CLASSIFY THE CONTENTS OF THE
-            # WINDOW
             
             # since we do not have a classifier, we'll just draw the window
             clone = resized.copy()
@@ -123,7 +119,7 @@ def main():
             cloneResize = cv2.resize(clone, (1728, 972))
             cv2.imshow("Window", cloneResize)
             cv2.waitKey(1)
-    # <-- DELETE COMMENT        time.sleep(0.025)
+            # time.sleep(0.025) # sleep time in ms after each window step
             
             # Scans window for matched image
             # ==================================================================================
@@ -146,6 +142,11 @@ def main():
                     if x1 >= (prev_x1 + round(stepSize/3) ) or x1 <= (prev_x1 - round(stepSize/3) ):
                         colNum += 1
                 
+                # NEEDS A CHECK TO SEE IF FIRST X IN PREVIOUS Y-ROW IS THE SAME
+                #   IF IT ISN'T, THEN MAKE PREVIOUS FIRST X IN PREVIOUS ROW
+                #   HAVE A COLUMN_NUMBER += 1 AND DELETE OLD SAVE AND RESAVE
+                #   WITH NEW NAME
+                
                 # Gets cropped image and saves cropped image
                 croppedImage = window[win_y1:win_y2, win_x1:win_x2]
                 cv2.imwrite("./Images/Cropped_Images/L{}-Row_{}-Col_{}.jpg".format(layer, rowNum, colNum), croppedImage)
@@ -153,6 +154,7 @@ def main():
                 prev_y1 = y1
                 prev_x1 = x1
             # ==================================================================================
+        
         layer += 1
 
 

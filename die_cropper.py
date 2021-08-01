@@ -52,7 +52,7 @@ def get_match(window, compareCrop, x, y):
         res = cv2.matchTemplate(window, compareCrop, method)   
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
         
-        if max_val>0.75: # ORIGINALLY: 0.98
+        if max_val>0.65: # ORIGINALLY: 0.98
             print("\nFOUND MATCH")
             print("max_val = ", max_val)
             print("Coordinates: x1:", x + max_loc[0], "y1:", y + max_loc[1], \
@@ -87,8 +87,8 @@ def main():
     image = cv2.imread(args["full"])
     compareCrop = cv2.imread(args["compareCrops"])
     
-    windowSizeFraction = 0.05 # What fraction of full image the window should be
-    stepSizeFraction = 0.03 # What fraction of full image the window should step by
+    windowSizeFraction = 0.06 # What fraction of full image the window should be
+    stepSizeFraction = 0.02 # What fraction of full image the window should step by
     
     # Predefine next for loop's parameters 
     layer = 0 # Layer of resolution-downscaled
@@ -115,11 +115,13 @@ def main():
             
             # since we do not have a classifier, we'll just draw the window
             clone = resized.copy()
-            cv2.rectangle(clone, (x, y), (x + winW, y + winH), (180, 0, 255), 50) # ORIGINAL COLOR IS 0,255,0
+            cv2.rectangle(clone, (x, y), (x + winW, y + winH), (255, 0, 180), 20) # ORIGINAL COLOR IS 0,255,0
+            # Add rect to area already saved
+            clone = cv2.rectangle(clone, (x, y), (x + winW, y + winH), (0, 255, 0), 20)
             cloneResize = cv2.resize(clone, (1728, 972))
             cv2.imshow("Window", cloneResize)
             cv2.waitKey(1)
-            # time.sleep(0.025) # sleep time in ms after each window step
+            # time.sleep(0.5) # sleep time in ms after each window step
             
             # Scans window for matched image
             # ==================================================================================
@@ -153,6 +155,7 @@ def main():
                 
                 prev_y1 = y1
                 prev_x1 = x1
+                
             # ==================================================================================
         
         layer += 1

@@ -10,7 +10,7 @@ import numpy as np
 
 # User Parameters/Constants to Set
 MATCH_CL = 0.50 # Minimum confidence level (CL) required to match image to scanned image
-SPLIT_MATCHES_CL =  0.80 # Splits matches to no defects and potential defects - between MATCH_CL and 1
+SPLIT_MATCHES_CL =  0.80 # Splits MATCH_CL to SPLIT_MATCHES_CL (defects) to one folder, rest (no defects) other folder
 FULL_IMAGE_PATH = "Images/Images_to_Scan/Original.jpg"
 GOLDEN_IMAGE_PATH = "Images/Images_to_Compare_for_Cropping/toCompare.jpg"
 SLEEP_TIME = 0.0 # Time to sleep in seconds between each window step

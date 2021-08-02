@@ -10,7 +10,7 @@ import numpy as np
 
 # User Parameters/Constants to Set
 MATCH_CL = 0.50 # Minimum confidence level (CL) required to match image to scanned image
-SPLIT_MATCHES_CL =  0.80 # Splits MATCH_CL to SPLIT_MATCHES_CL (defects) to one folder, rest (no defects) other folder
+SPLIT_MATCHES_CL =  0.84 # Splits MATCH_CL to SPLIT_MATCHES_CL (defects) to one folder, rest (no defects) other folder
 FULL_IMAGE_PATH = "Images/Images_to_Scan/Original.jpg"
 GOLDEN_IMAGE_PATH = "Images/Images_to_Compare_for_Cropping/toCompare.jpg"
 SLEEP_TIME = 0.0 # Time to sleep in seconds between each window step
@@ -121,10 +121,10 @@ for (resized, resizedCrop) in pyramid(image, compareCrop, scale=1.5):
         
         # Draw rectangle over sliding window for debugging and easier visual
         clone = resized.copy()
-        cv2.rectangle(clone, (x, y), (x + winW, y + winH), (255, 0, 180), 20)
+        cv2.rectangle(clone, (x, y), (x + winW, y + winH), (255, 0, 180), 30)
         # TESTING BELOW
         # Add rect to failing area already saved
-        cv2.rectangle(clone, (BadX1, BadY1), (BadX2, BadY2), (0, 100, 255), 20)
+        cv2.rectangle(clone, (BadX1, BadY1), (BadX2, BadY2), (0, 100, 255), 30)
         cloneResize = cv2.resize(clone, (1728, 972))
         cv2.imshow("Window", cloneResize)
         cv2.waitKey(1)
@@ -191,7 +191,7 @@ for (resized, resizedCrop) in pyramid(image, compareCrop, scale=1.5):
                 # Separate copy of resized with all bad dies showing orange boxes
                 # TESTING BELOW
                 # Add rect to failing area already saved
-                cv2.rectangle(clone2, (BadX1, BadY1), (BadX2, BadY2), (0, 100, 255), 20)
+                cv2.rectangle(clone2, (BadX1, BadY1), (BadX2, BadY2), (0, 50, 255), 30)
         # ==================================================================================
     
     cv2.imwrite("./Images/Image_with_Failing_Dies_Overlay/ImageWithBoxes.jpg", clone2)

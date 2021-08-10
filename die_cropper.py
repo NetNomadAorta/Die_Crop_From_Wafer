@@ -20,7 +20,7 @@ def deleteDirContents(dir):
         os.remove(os.path.join(dir, f))
 
 
-def pyramid(image, compareCrop, scale=1.5, minSize=(500, 500)):
+def pyramid(image, compareCrop, scale=1.5, minSize = (500, 500)):
     # yield the original image
     yield (image, compareCrop)
     
@@ -28,9 +28,9 @@ def pyramid(image, compareCrop, scale=1.5, minSize=(500, 500)):
     while True:
         # compute the new dimensions of the image and resize it
         w1 = int(image.shape[1] / scale)
-        image = imutils.resize(image, width=w1)
+        image = imutils.resize(image, width = w1)
         w2 = int(compareCrop.shape[1] / scale)
-        compareCrop = imutils.resize(compareCrop, width=w2)
+        compareCrop = imutils.resize(compareCrop, width = w2)
         
         # if the resized image does not meet the supplied minimum
         #     size, then stop constructing the pyramid
@@ -55,7 +55,7 @@ def getMatch(window, compareCrop, x, y):
     h1, w1, c1 = window.shape
     h2, w2, c2 = compareCrop.shape
     
-    if c1==c2 and h2<=h1 and w2<=w1:
+    if c1 == c2 and h2 <= h1 and w2<=w1:
         method = eval('cv2.TM_CCOEFF_NORMED')
         res = cv2.matchTemplate(window, compareCrop, method)   
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
@@ -64,7 +64,7 @@ def getMatch(window, compareCrop, x, y):
             print("\nFOUND MATCH")
             print("max_val = ", max_val)
             print("Coordinates: x1:", x + max_loc[0], "y1:", y + max_loc[1], \
-                  "x2:", x + max_loc[0]+w2, "y2:", y + max_loc[1]+h2)
+                  "x2:", x + max_loc[0] + w2, "y2:", y + max_loc[1]+h2)
             
             # Gets coordinates of cropped image
             return (max_loc[0], max_loc[1], max_loc[0] + w2, max_loc[1] + h2, max_val)
@@ -144,12 +144,12 @@ for (resized, resizedCrop) in pyramid(image, compareCrop, scale=1.5):
             y2 = y + win_y2
             
             # Makes sure same image does not get saved as different names
-            if y1 >= (prev_y1 + round(stepSizeY/3) ) or y1 <= (prev_y1 - round(stepSizeY/3)):
+            if y1 >= (prev_y1 + round(stepSizeY / 3) ) or y1 <= (prev_y1 - round(stepSizeY / 3)):
                 rowNum += 1
                 colNum = 1
                 sameCol = False
             else:
-                if x1 >= (prev_x1 + round(stepSizeX/3) ) or x1 <= (prev_x1 - round(stepSizeX/3)):
+                if x1 >= (prev_x1 + round(stepSizeX / 3) ) or x1 <= (prev_x1 - round(stepSizeX / 3)):
                     colNum += 1
                     prev_matchedCL = 0
                     sameCol = False

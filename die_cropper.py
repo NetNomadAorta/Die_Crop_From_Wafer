@@ -194,5 +194,6 @@ for (resized, resizedCrop) in pyramid(image, compareCrop, scale=1.5):
                 cv2.rectangle(clone2, (BadX1, BadY1), (BadX2, BadY2), (0, 50, 255), 30)
         # ==================================================================================
     
+    # Saves window with orange boxes around potential bad dies
     cv2.imwrite("./Images/Image_with_Failing_Dies_Overlay/ImageWithBoxes.jpg", clone2)
     layer += 1

@@ -1,38 +1,36 @@
 # import the necessary packages
 import imutils
-import glob
-import json
-import argparse
 import time
 import cv2
 import os
-import numpy as np
 
 # User Parameters/Constants to Set
-MATCH_CL = 0.50 # Minimum confidence level (CL) required to match image to scanned image
+MATCH_CL = 0.70 # Minimum confidence level (CL) required to match image to scanned image
 SPLIT_MATCHES_CL =  0.84 # Splits MATCH_CL to SPLIT_MATCHES_CL (defects) to one folder, rest (no defects) other folder
-FULL_IMAGE_PATH = "Images/Images_to_Scan/Original.jpg"
+FULL_IMAGE_PATH = "Images/Images_to_Scan/o.jpg"
 GOLDEN_IMAGE_PATH = "Images/Images_to_Compare_for_Cropping/toCompare.jpg"
 SLEEP_TIME = 0.0 # Time to sleep in seconds between each window step
 
 def deleteDirContents(dir):
+    # Deletes photos in path "dir"
+    # # Used for deleting previous cropped photos from last run
     for f in os.listdir(dir):
         os.remove(os.path.join(dir, f))
 
 
 def pyramid(image, compareCrop, scale=1.5, minSize = (500, 500)):
-    # yield the original image
+    # Yield the original image
     yield (image, compareCrop)
     
-    # keep looping over the pyramid
+    # Keep looping over the pyramid
     while True:
-        # compute the new dimensions of the image and resize it
+        # Compute the new dimensions of the image and resize it
         w1 = int(image.shape[1] / scale)
         image = imutils.resize(image, width = w1)
         w2 = int(compareCrop.shape[1] / scale)
         compareCrop = imutils.resize(compareCrop, width = w2)
         
-        # if the resized image does not meet the supplied minimum
+        # If the resized image does not meet the supplied minimum
         #     size, then stop constructing the pyramid
         if image.shape[0] < minSize[1] or image.shape[1] < minSize[0] \
             or compareCrop.shape[0] < minSize[1] or compareCrop.shape[1] < minSize[0]:
@@ -42,15 +40,15 @@ def pyramid(image, compareCrop, scale=1.5, minSize = (500, 500)):
         yield (image, compareCrop)
 
 
-def slidingWindow(image, stepSizeX, stepSizeY, windowSize): # stepSize normally 4 to 8 (pixels)
-    # slide a window across the image
+def slidingWindow(image, stepSizeX, stepSizeY, windowSize):
+    # Slide a window across the image
     for y in range(0, image.shape[0], stepSizeY):
         for x in range(0, image.shape[1], stepSizeX):
-            # yield the current window
+            # Yield the current window
             yield (x, y, image[y:y + windowSize[1], x:x + windowSize[0]])
 
 
-# Comparison Scan
+# Comparison scan of scanning window-image to golden-image
 def getMatch(window, compareCrop, x, y):
     h1, w1, c1 = window.shape
     h2, w2, c2 = compareCrop.shape
@@ -64,7 +62,7 @@ def getMatch(window, compareCrop, x, y):
             print("\nFOUND MATCH")
             print("max_val = ", max_val)
             print("Coordinates: x1:", x + max_loc[0], "y1:", y + max_loc[1], \
-                  "x2:", x + max_loc[0] + w2, "y2:", y + max_loc[1]+h2)
+                  "x2:", x + max_loc[0] + w2, "y2:", y + max_loc[1] + h2)
             
             # Gets coordinates of cropped image
             return (max_loc[0], max_loc[1], max_loc[0] + w2, max_loc[1] + h2, max_val)
@@ -99,8 +97,8 @@ for (resized, resizedCrop) in pyramid(image, compareCrop, scale=1.5):
     stepSizeY = round(winH / 3)
     
     # Predefine next for loop's parameters 
-    prev_y1 = 0
-    prev_x1 = 0
+    prev_y1 = stepSizeY # Number that prevents y = 0 = prev_y1
+    prev_x1 = stepSizeX
     rowNum = 0
     colNum = 0
     prev_matchedCL = 0
@@ -125,7 +123,7 @@ for (resized, resizedCrop) in pyramid(image, compareCrop, scale=1.5):
         # TESTING BELOW
         # Add rect to failing area already saved
         cv2.rectangle(clone, (BadX1, BadY1), (BadX2, BadY2), (0, 100, 255), 30)
-        cloneResize = cv2.resize(clone, (1728, 972))
+        cloneResize = cv2.resize(clone, (round(image.shape[1] / image.shape[0] * 1000), 1000))
         cv2.imshow("Window", cloneResize)
         cv2.waitKey(1)
         time.sleep(SLEEP_TIME) # sleep time in ms after each window step
@@ -164,23 +162,23 @@ for (resized, resizedCrop) in pyramid(image, compareCrop, scale=1.5):
             if (sameCol == False) or (sameCol == True and matchedCL > prev_matchedCL): 
                 # Gets cropped image and saves cropped image
                 croppedImage = window[win_y1:win_y2, win_x1:win_x2]
-                cv2.imwrite("./Images/Cropped_Images/L{}-Row_{}-Col_{}.jpg".format(layer, rowNum, colNum), croppedImage)
+                cv2.imwrite("./Images/Cropped_Images/L{}-R{}-C{}.jpg".format(layer, rowNum, colNum), croppedImage)
                 # Splits cropped images to folders with potential defects and no defects
                 if matchedCL > SPLIT_MATCHES_CL:
-                    cv2.imwrite("./Images/Splitted_Cropped_Images/No_Defects/L{}-Row_{}-Col_{}-CL_{}.jpg".format(layer, rowNum, colNum, round(matchedCL, 2)), croppedImage)
+                    cv2.imwrite("./Images/Splitted_Cropped_Images/No_Defects/L{}-R{}-C{}-CL_{}.jpg".format(layer, rowNum, colNum, round(matchedCL, 2)), croppedImage)
                 else: 
                     # TESTING BELOW
                     BadX1 = x1
                     BadY1 = y1
                     BadX2 = x2
                     BadY2 = y2
-                    cv2.imwrite("./Images/Splitted_Cropped_Images/Potential_Defects/L{}-Row_{}-Col_{}-CL_{}.jpg".format(layer, rowNum, colNum,  round(matchedCL, 2)), croppedImage)
+                    cv2.imwrite("./Images/Splitted_Cropped_Images/Potential_Defects/L{}-R{}-C{}-CL_{}.jpg".format(layer, rowNum, colNum,  round(matchedCL, 2)), croppedImage)
                 # If previous same Row and Column will be saved twice, deletes first one
                 if sameCol == True and matchedCL > prev_matchedCL:
-                    if "L{}-Row_{}-Col_{}-CL_{}.jpg".format(layer, rowNum, colNum, round(prev_matchedCL, 2)) in os.listdir("./Images/Splitted_Cropped_Images/No_Defects/"): 
-                        os.remove("./Images/Splitted_Cropped_Images/No_Defects/L{}-Row_{}-Col_{}-CL_{}.jpg".format(layer, rowNum, colNum, round(prev_matchedCL, 2)))
-                    if "L{}-Row_{}-Col_{}-CL_{}.jpg".format(layer, rowNum, colNum, round(prev_matchedCL, 2)) in os.listdir("./Images/Splitted_Cropped_Images/Potential_Defects/"): 
-                        os.remove("./Images/Splitted_Cropped_Images/Potential_Defects/L{}-Row_{}-Col_{}-CL_{}.jpg".format(layer, rowNum, colNum, round(prev_matchedCL, 2)))
+                    if "L{}-R{}-C{}-CL_{}.jpg".format(layer, rowNum, colNum, round(prev_matchedCL, 2)) in os.listdir("./Images/Splitted_Cropped_Images/No_Defects/"): 
+                        os.remove("./Images/Splitted_Cropped_Images/No_Defects/L{}-R{}-C{}-CL_{}.jpg".format(layer, rowNum, colNum, round(prev_matchedCL, 2)))
+                    if "L{}-R{}-C{}-CL_{}.jpg".format(layer, rowNum, colNum, round(prev_matchedCL, 2)) in os.listdir("./Images/Splitted_Cropped_Images/Potential_Defects/"): 
+                        os.remove("./Images/Splitted_Cropped_Images/Potential_Defects/L{}-R{}-C{}-CL_{}.jpg".format(layer, rowNum, colNum, round(prev_matchedCL, 2)))
             
             prev_y1 = y1
             prev_x1 = x1

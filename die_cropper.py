@@ -6,8 +6,8 @@ import cv2
 import time
 
 # User Parameters/Constants to Set
-MATCH_CL = 0.80 # Minimum confidence level (CL) required to match golden-image to scanned image
-SPLIT_MATCHES_CL =  0.95 # Splits MATCH_CL to SPLIT_MATCHES_CL (defects) to one folder, rest (no defects) other folder
+MATCH_CL = 0.60 # Minimum confidence level (CL) required to match golden-image to scanned image
+SPLIT_MATCHES_CL =  0.85 # Splits MATCH_CL to SPLIT_MATCHES_CL (defects) to one folder, rest (no defects) other folder
 FULL_IMAGE_DIRECTORY = "Images/to_Scan_Image/"
 GOLDEN_IMAGE_DIRECTORY = "Images/Golden_Image/"
 SLEEP_TIME = 0.0 # Time to sleep in seconds between each window step

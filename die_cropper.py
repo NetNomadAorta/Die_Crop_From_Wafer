@@ -6,10 +6,10 @@ import cv2
 import time
 
 # User Parameters/Constants to Set
-MATCH_CL = 0.60 # Minimum confidence level (CL) required to match golden-image to scanned image
-SPLIT_MATCHES_CL =  0.85 # Splits MATCH_CL to SPLIT_MATCHES_CL (defects) to one folder, rest (no defects) other folder
-FULL_IMAGE_DIRECTORY = "Images/to_Scan_Image/"
-GOLDEN_IMAGE_DIRECTORY = "Images/Golden_Image/"
+MATCH_CL = 0.80 # Minimum confidence level (CL) required to match golden-image to scanned image
+SPLIT_MATCHES_CL =  0.95 # Splits MATCH_CL to SPLIT_MATCHES_CL (defects) to one folder, rest (no defects) other folder
+STICHED_IMAGES_DIRECTORY = "Images/Stitched_Images/"
+GOLDEN_IMAGES_DIRECTORY = "Images/Golden_Images/"
 SLEEP_TIME = 0.0 # Time to sleep in seconds between each window step
 
 
@@ -85,9 +85,9 @@ deleteDirContents("./Images/Splitted_Cropped_Die_Images/Potential_Defects/")
 deleteDirContents("./Images/Failing_Dies_Overlayed_on_Wafer_Image")
 
 # load the full and comparing crop images
-fullImagePath = glob.glob(FULL_IMAGE_DIRECTORY + "*")
+fullImagePath = glob.glob(STICHED_IMAGES_DIRECTORY + "*")
 fullImage = cv2.imread(fullImagePath[0])
-goldenImagePath = glob.glob(GOLDEN_IMAGE_DIRECTORY + "*")
+goldenImagePath = glob.glob(GOLDEN_IMAGES_DIRECTORY + "*")
 goldenImage = cv2.imread(goldenImagePath[0])
 
 # Parameter set
@@ -133,7 +133,7 @@ for (x, y, window) in slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize)
     # ==================================================================================
     # Scans window and grabs cropped image coordinates relative to window
     # Uses each golden image in the file if multiple part types are present
-    for goldenImagePath in glob.glob(GOLDEN_IMAGE_DIRECTORY + "*"):
+    for goldenImagePath in glob.glob(GOLDEN_IMAGES_DIRECTORY + "*"):
         goldenImage = cv2.imread(goldenImagePath)
         win_x1, win_y1, win_x2, win_y2, matchedCL = getMatch(window, goldenImage, x, y)
         

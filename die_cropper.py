@@ -1,4 +1,4 @@
-# import the necessary packages
+# Import the necessary packages
 import os
 import glob
 import imutils
@@ -44,14 +44,14 @@ def pyramid(fullImage, goldenImage, scale=1.5, minSize = (500, 500)):
 
 
 def slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize):
-    # Slide a window across the resized full image
+    # Slides a window across the stitched-image
     for y in range(0, fullImage.shape[0], stepSizeY):
         for x in range(0, fullImage.shape[1], stepSizeX):
             # Yield the current window
             yield (x, y, fullImage[y:y + windowSize[1], x:x + windowSize[0]])
 
 
-# Comparison scan of scanning window-image to golden-image
+# Comparison scan window-image to golden-image
 def getMatch(window, goldenImage, x, y):
     h1, w1, c1 = window.shape
     h2, w2, c2 = goldenImage.shape
@@ -64,7 +64,7 @@ def getMatch(window, goldenImage, x, y):
         if max_val > MATCH_CL: 
             print("\nFOUND MATCH")
             print("max_val = ", max_val)
-            print("Coordinates: x1:", x + max_loc[0], "y1:", y + max_loc[1], \
+            print("Window Coordinates: x1:", x + max_loc[0], "y1:", y + max_loc[1], \
                   "x2:", x + max_loc[0] + w2, "y2:", y + max_loc[1] + h2)
             
             # Gets coordinates of cropped image
@@ -84,7 +84,7 @@ deleteDirContents("./Images/Splitted_Cropped_Die_Images/Not_Likely_Defects/")
 deleteDirContents("./Images/Splitted_Cropped_Die_Images/Potential_Defects/")
 deleteDirContents("./Images/Failing_Dies_Overlayed_on_Wafer_Image")
 
-# load the full and comparing crop images
+# Load the first of each stitched- and golden-images
 fullImagePath = glob.glob(STICHED_IMAGES_DIRECTORY + "*")
 fullImage = cv2.imread(fullImagePath[0])
 goldenImagePath = glob.glob(GOLDEN_IMAGES_DIRECTORY + "*")
@@ -135,23 +135,24 @@ for (x, y, window) in slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize)
     # Uses each golden image in the file if multiple part types are present
     for goldenImagePath in glob.glob(GOLDEN_IMAGES_DIRECTORY + "*"):
         goldenImage = cv2.imread(goldenImagePath)
+        # Gets coordinates relative to window of matched dies within a Stitched-Image
         win_x1, win_y1, win_x2, win_y2, matchedCL = getMatch(window, goldenImage, x, y)
         
         # Saves cropped image and names with coordinates
         if win_x1 != "null":
-            # Turns cropped image coordinates relative to window to full image coordinates
+            # Turns cropped image coordinates relative to window to stitched-image coordinates
             x1 = x + win_x1
             y1 = y + win_y1
             x2 = x + win_x2
             y2 = y + win_y2
             
             # Makes sure same image does not get saved as different names
-            if y1 >= (prev_y1 + round(stepSizeY / 2.95) ) or y1 <= (prev_y1 - round(stepSizeY / 2.95)):
+            if y1 >= (prev_y1 + round(stepSizeY / 2.95)) or y1 <= (prev_y1 - round(stepSizeY / 2.95)):
                 rowNum += 1
                 colNum = 1
                 sameCol = False
             else:
-                if x1 >= (prev_x1 + round(stepSizeX / 2.95) ) or x1 <= (prev_x1 - round(stepSizeX / 2.95)):
+                if x1 >= (prev_x1 + round(stepSizeX / 2.95)) or x1 <= (prev_x1 - round(stepSizeX / 2.95)):
                     colNum += 1
                     prev_matchedCL = 0
                     sameCol = False
@@ -179,6 +180,11 @@ for (x, y, window) in slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize)
                     cv2.imwrite("./Images/Splitted_Cropped_Die_Images/Potential_Defects/R{}-C{}-CL{}.jpg".format(rowNum, colNum,  round(matchedCL * 100)), croppedImage)
                 # If previous same Row and Column will be saved twice, deletes first one
                 if sameCol == True and matchedCL > prev_matchedCL:
+                    clone2 = clone2Backup
+                    BadX1 = 0
+                    BadY1 = 0
+                    BadX2 = 0
+                    BadY2 = 0
                     if "R{}-C{}-CL{}.jpg".format(rowNum, colNum, round(prev_matchedCL * 100)) in os.listdir("./Images/Splitted_Cropped_Die_Images/Not_Likely_Defects/"): 
                         os.remove("./Images/Splitted_Cropped_Die_Images/Not_Likely_Defects/R{}-C{}-CL{}.jpg".format(rowNum, colNum, round(prev_matchedCL * 100)))
                     if "R{}-C{}-CL{}.jpg".format(rowNum, colNum, round(prev_matchedCL * 100)) in os.listdir("./Images/Splitted_Cropped_Die_Images/Potential_Defects/"): 
@@ -191,6 +197,8 @@ for (x, y, window) in slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize)
             # Draws orange boxes around bad dies
             # Separate copy of resized full image with all bad dies showing orange boxes
             # TESTING BELOW
+            # Saves backup of clone2 before next rectangle write
+            clone2Backup = clone2.copy()
             # Add rect to failing area already saved
             cv2.rectangle(clone2, (BadX1, BadY1), (BadX2, BadY2), (0, 50, 255), 20)
         # ==================================================================================

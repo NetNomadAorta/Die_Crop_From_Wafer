@@ -7,7 +7,7 @@ import time
 
 # User Parameters/Constants to Set
 MATCH_CL = 0.75 # Minimum confidence level (CL) required to match golden-image to scanned image
-SPLIT_MATCHES_CL =  0.90 # Splits MATCH_CL to SPLIT_MATCHES_CL (defects) to one folder, rest (no defects) other folder
+SPLIT_MATCHES_CL =  0.85 # Splits MATCH_CL to SPLIT_MATCHES_CL (defects) to one folder, rest (no defects) other folder
 STICHED_IMAGES_DIRECTORY = "Images/Stitched_Images/"
 GOLDEN_IMAGES_DIRECTORY = "Images/Golden_Images/"
 SLEEP_TIME = 0.0 # Time to sleep in seconds between each window step
@@ -124,11 +124,11 @@ for (x, y, window) in slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize)
     
     # Draw rectangle over sliding window for debugging and easier visual
     clone = fullImage.copy()
-    cv2.rectangle(clone, (x, y), (x + winW, y + winH), (255, 0, 180), 30)
+    cv2.rectangle(clone, (x, y), (x + winW, y + winH), (255, 0, 180), 20)
     # TESTING BELOW
     # Add rect to failing area already saved
-    cv2.rectangle(clone, (BadX1, BadY1), (BadX2, BadY2), (0, 100, 255), 30)
-    cloneResize = cv2.resize(clone, (round(fullImage.shape[1] / fullImage.shape[0] * 950), 950))
+    cv2.rectangle(clone, (BadX1, BadY1), (BadX2, BadY2), (0, 100, 255), 20)
+    cloneResize = cv2.resize(clone, (round(fullImage.shape[1] / fullImage.shape[0] * 900), 900))
     cv2.imshow("Window", cloneResize)
     cv2.waitKey(1)
     time.sleep(SLEEP_TIME) # sleep time in ms after each window step
@@ -172,6 +172,15 @@ for (x, y, window) in slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize)
                 # Gets cropped image and saves cropped image
                 croppedImage = window[win_y1:win_y2, win_x1:win_x2]
                 cv2.imwrite("./Images/Cropped_Die_Images/Row_{}-Col_{}.jpg".format(rowNum, colNum), croppedImage)
+                # TESTING BELOW
+                # SAVES CROPPED TO NEW FOLDER WITH CROP NAME
+                os.makedirs(("./Images/" + \
+                    os.listdir("Images/Stitched_Images/")[0].replace(".jpg","") +\
+                    "/Cropped_Die_Images"), exist_ok=True)
+                cv2.imwrite("./Images/" + \
+                    os.listdir("Images/Stitched_Images/")[0].replace(".jpg","") +\
+                    "/Cropped_Die_Images" +\
+                    "/Row_{}-Col_{}.jpg".format(rowNum, colNum), croppedImage)
                 # Splits cropped images to folders with potential defects and no defects
                 if matchedCL > SPLIT_MATCHES_CL:
                     cv2.imwrite("./Images/Splitted_Cropped_Die_Images/Not_Likely_Defects/R{}-C{}-CL{}.jpg".format(rowNum, colNum, round(matchedCL * 100)), croppedImage)
@@ -204,7 +213,7 @@ for (x, y, window) in slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize)
             # Saves backup of clone2 before next rectangle write
             clone2Backup = clone2.copy()
             # Add rect to failing area already saved
-            cv2.rectangle(clone2, (BadX1, BadY1), (BadX2, BadY2), (0, 50, 255), 20)
+            cv2.rectangle(clone2, (BadX1, BadY1), (BadX2, BadY2), (0, 50, 255), 15)
             prev_BadX1 = BadX1
             prev_BadY1 = BadY1
             prev_BadX2 = BadX2
@@ -213,3 +222,12 @@ for (x, y, window) in slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize)
 
 # Saves window with orange boxes around potential bad dies
 cv2.imwrite("./Images/Failing_Dies_Overlayed_on_Wafer_Image/ImageWithBoxes.jpg", clone2)
+# TESTING BELOW
+# SAVES Overlay Window TO NEW FOLDER WITH Stitched-Image NAME
+os.makedirs(("./Images/" + \
+    os.listdir("Images/Stitched_Images/")[0].replace(".jpg","") +\
+    "/Failing_Dies_Overlayed_on_Wafer_Image"), exist_ok=True)
+cv2.imwrite("./Images/" + \
+    os.listdir("Images/Stitched_Images/")[0].replace(".jpg","") +\
+    "/Failing_Dies_Overlayed_on_Wafer_Image" +\
+    "/ImageWithBoxes.jpg", clone2)

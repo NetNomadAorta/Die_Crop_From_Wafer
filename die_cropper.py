@@ -6,8 +6,8 @@ import cv2
 import time
 
 # User Parameters/Constants to Set
-MATCH_CL = 0.80 # Minimum confidence level (CL) required to match golden-image to scanned image
-SPLIT_MATCHES_CL =  0.95 # Splits MATCH_CL to SPLIT_MATCHES_CL (defects) to one folder, rest (no defects) other folder
+MATCH_CL = 0.75 # Minimum confidence level (CL) required to match golden-image to scanned image
+SPLIT_MATCHES_CL =  0.90 # Splits MATCH_CL to SPLIT_MATCHES_CL (defects) to one folder, rest (no defects) other folder
 STICHED_IMAGES_DIRECTORY = "Images/Stitched_Images/"
 GOLDEN_IMAGES_DIRECTORY = "Images/Golden_Images/"
 SLEEP_TIME = 0.0 # Time to sleep in seconds between each window step
@@ -104,6 +104,10 @@ rowNum = 0
 colNum = 0
 prev_matchedCL = 0
 # TESTING BELOW
+prev_BadX1 = 0
+prev_BadY1 = 0
+prev_BadX2 = 0
+prev_BadY2 = 0
 BadX1 = 0
 BadY1 = 0
 BadX2 = 0
@@ -201,6 +205,10 @@ for (x, y, window) in slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize)
             clone2Backup = clone2.copy()
             # Add rect to failing area already saved
             cv2.rectangle(clone2, (BadX1, BadY1), (BadX2, BadY2), (0, 50, 255), 20)
+            prev_BadX1 = BadX1
+            prev_BadY1 = BadY1
+            prev_BadX2 = BadX2
+            prev_BadY2 = BadY2
         # ==================================================================================
 
 # Saves window with orange boxes around potential bad dies

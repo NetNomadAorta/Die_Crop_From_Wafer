@@ -76,9 +76,10 @@ def getMatch(window, goldenImage, x, y):
 
 # MAIN():
 # =============================================================================
+# Clears some of the screen for asthetics
 print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
 
-# Deletes contents in cropped and split folders
+# Deletes contents in cropped- and split-image folders
 deleteDirContents("./Images/Cropped_Die_Images/")
 deleteDirContents("./Images/Splitted_Cropped_Die_Images/Not_Likely_Defects/")
 deleteDirContents("./Images/Splitted_Cropped_Die_Images/Potential_Defects/")
@@ -91,8 +92,8 @@ goldenImagePath = glob.glob(GOLDEN_IMAGES_DIRECTORY + "*")
 goldenImage = cv2.imread(goldenImagePath[0])
 
 # Parameter set
-winW = round(goldenImage.shape[1] * 1.5) # Scales window width according to full image resolution
-winH = round(goldenImage.shape[0] * 1.5) # Scales window height according to full image resolution
+winW = round(goldenImage.shape[1] * 1.5) # Scales window width with full image resolution
+winH = round(goldenImage.shape[0] * 1.5) # Scales window height with full image resolution
 windowSize = (winW, winH)
 stepSizeX = round(winW / 2.95)
 stepSizeY = round(winH / 2.95)
@@ -108,13 +109,14 @@ prev_BadX1 = 0
 prev_BadY1 = 0
 prev_BadX2 = 0
 prev_BadY2 = 0
+# BELOW IS FINE
 BadX1 = 0
 BadY1 = 0
 BadX2 = 0
 BadY2 = 0
 
 # TESTING BELOW FOR SAVING FULL IMAGE WITH BAD DIE BOXES
-clone2 = fullImage.copy()
+fullImageClone = fullImage.copy()
 
 # loop over the sliding window
 for (x, y, window) in slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize):
@@ -123,13 +125,13 @@ for (x, y, window) in slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize)
         continue
     
     # Draw rectangle over sliding window for debugging and easier visual
-    clone = fullImage.copy()
-    cv2.rectangle(clone, (x, y), (x + winW, y + winH), (255, 0, 180), 20)
+    displayImage = fullImage.copy()
+    cv2.rectangle(displayImage, (x, y), (x + winW, y + winH), (255, 0, 180), 20)
     # TESTING BELOW
     # Add rect to failing area already saved
-    cv2.rectangle(clone, (BadX1, BadY1), (BadX2, BadY2), (0, 100, 255), 20)
-    cloneResize = cv2.resize(clone, (round(fullImage.shape[1] / fullImage.shape[0] * 900), 900))
-    cv2.imshow("Window", cloneResize)
+    cv2.rectangle(displayImage, (BadX1, BadY1), (BadX2, BadY2), (0, 100, 255), 20)
+    displayImageResize = cv2.resize(displayImage, (round(fullImage.shape[1] / fullImage.shape[0] * 900), 900))
+    cv2.imshow("Window", displayImageResize)
     cv2.waitKey(1)
     time.sleep(SLEEP_TIME) # sleep time in ms after each window step
     
@@ -193,7 +195,7 @@ for (x, y, window) in slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize)
                     cv2.imwrite("./Images/Splitted_Cropped_Die_Images/Potential_Defects/R{}-C{}-CL{}.jpg".format(rowNum, colNum,  round(matchedCL * 100)), croppedImage)
                 # If previous same Row and Column will be saved twice, deletes first one
                 if sameCol == True and matchedCL > prev_matchedCL:
-                    clone2 = clone2Backup
+                    fullImageClone = fullImageClone_Backup
                     BadX1 = 0
                     BadY1 = 0
                     BadX2 = 0
@@ -210,10 +212,10 @@ for (x, y, window) in slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize)
             # Draws orange boxes around bad dies
             # Separate copy of resized full image with all bad dies showing orange boxes
             # TESTING BELOW
-            # Saves backup of clone2 before next rectangle write
-            clone2Backup = clone2.copy()
+            # Saves backup of fullImageClone before next rectangle write
+            fullImageClone_Backup = fullImageClone.copy()
             # Add rect to failing area already saved
-            cv2.rectangle(clone2, (BadX1, BadY1), (BadX2, BadY2), (0, 50, 255), 15)
+            cv2.rectangle(fullImageClone, (BadX1, BadY1), (BadX2, BadY2), (0, 50, 255), 15)
             prev_BadX1 = BadX1
             prev_BadY1 = BadY1
             prev_BadX2 = BadX2
@@ -221,7 +223,7 @@ for (x, y, window) in slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize)
         # ==================================================================================
 
 # Saves window with orange boxes around potential bad dies
-cv2.imwrite("./Images/Failing_Dies_Overlayed_on_Wafer_Image/ImageWithBoxes.jpg", clone2)
+cv2.imwrite("./Images/Failing_Dies_Overlayed_on_Wafer_Image/ImageWithBoxes.jpg", fullImageClone)
 # TESTING BELOW
 # SAVES Overlay Window TO NEW FOLDER WITH Stitched-Image NAME
 os.makedirs(("./Images/" + \
@@ -230,4 +232,4 @@ os.makedirs(("./Images/" + \
 cv2.imwrite("./Images/" + \
     os.listdir("Images/Stitched_Images/")[0].replace(".jpg","") +\
     "/Failing_Dies_Overlayed_on_Wafer_Image" +\
-    "/ImageWithBoxes.jpg", clone2)
+    "/ImageWithBoxes.jpg", fullImageClone)

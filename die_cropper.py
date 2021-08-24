@@ -4,6 +4,8 @@ import glob
 import imutils
 import cv2
 import time
+# TESTING SVD FROM NUMPY
+import numpy as np
 
 # User Parameters/Constants to Set
 MATCH_CL = 0.65 # Minimum confidence level (CL) required to match golden-image to scanned image
@@ -84,6 +86,7 @@ deleteDirContents("./Images/Cropped_Die_Images/")
 deleteDirContents("./Images/Splitted_Cropped_Die_Images/Not_Likely_Defects/")
 deleteDirContents("./Images/Splitted_Cropped_Die_Images/Potential_Defects/")
 deleteDirContents("./Images/Failing_Dies_Overlayed_on_Wafer_Image")
+deleteDirContents("./Images/SVD_Cropped_Die_Images/")
 
 # Load the first of each stitched- and golden-images
 fullImagePath = glob.glob(STICHED_IMAGES_DIRECTORY + "*")
@@ -174,6 +177,7 @@ for (x, y, window) in slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize)
                 # Gets cropped image and saves cropped image
                 croppedImage = window[win_y1:win_y2, win_x1:win_x2]
                 cv2.imwrite("./Images/Cropped_Die_Images/Row_{}-Col_{}.jpg".format(rowNum, colNum), croppedImage)
+                
                 # TESTING BELOW
                 # SAVES CROPPED TO NEW FOLDER WITH CROP NAME
                 os.makedirs(("./Images/" + \
@@ -183,6 +187,7 @@ for (x, y, window) in slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize)
                     os.listdir("Images/Stitched_Images/")[0].replace(".jpg","") +\
                     "/Cropped_Die_Images" +\
                     "/Row_{}-Col_{}.jpg".format(rowNum, colNum), croppedImage)
+                
                 # Splits cropped images to folders with potential defects and no defects
                 if matchedCL > SPLIT_MATCHES_CL:
                     cv2.imwrite("./Images/Splitted_Cropped_Die_Images/Not_Likely_Defects/R{}-C{}-CL{}.jpg".format(rowNum, colNum, round(matchedCL * 100)), croppedImage)

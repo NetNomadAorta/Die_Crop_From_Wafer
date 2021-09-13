@@ -75,6 +75,69 @@ def getMatch(window, goldenImage, x, y):
         else:
             return ("null", "null", "null", "null", "null")
 
+# NOT IN USE
+def compressImage(imageToCompress, k):
+    print("processing...")
+    img = imageToCompress # getting image from
+    
+    # splitting the array into three 2D array (svd only apply on 2D array)
+    r = img[:,:,0]  # array for R
+    g = img[:,:,1]  # array for G
+    b = img[:,:,2] # array for B
+    
+    print("compressing...")
+    
+    # Calculating the svd components for all three arrays
+    ur,sr,vr = np.linalg.svd(r, full_matrices=False)
+    ug,sg,vg = np.linalg.svd(g, full_matrices=False)
+    ub,sb,vb = np.linalg.svd(b, full_matrices=False)
+    
+    # Forming the compress image with reduced information
+    # We are selecting only k singular values for each array to make image which will exclude some information from the 
+    # image while image will be of same dimension
+    
+    # ur (mxk), diag(sr) (kxk) and vr (kxn) if image is off (mxn)
+    # so let suppose we only selecting the k1 singular value from diag(sr) to form image
+    
+    rr = np.dot(ur[:,:k],np.dot(np.diag(sr[:k]), vr[:k,:]))
+    rg = np.dot(ug[:,:k],np.dot(np.diag(sg[:k]), vg[:k,:]))
+    rb = np.dot(ub[:,:k],np.dot(np.diag(sb[:k]), vb[:k,:]))
+    
+    print("arranging...")
+    
+    # Creating a array of zeroes; shape will be same as of image matrix
+    rimg = np.zeros(img.shape)
+    
+    # Adding matrix for R, G & B in created array
+    rimg[:,:,0] = rr
+    rimg[:,:,1] = rg
+    rimg[:,:,2] = rb
+    
+    # It will check if any value will be less than 0 will be converted to its absolute
+    # and, if any value is greater than 255 than it will be converted to 255
+    # because in image array of unit8 can only have value between 0 & 255
+    for ind1, row in enumerate(rimg):
+        for ind2, col in enumerate(row):
+            for ind3, value in enumerate(col):
+                if value < 0:
+                    rimg[ind1,ind2,ind3] = abs(value)
+                if value > 255:
+                    rimg[ind1,ind2,ind3] = 255
+
+    # converting the compress image array to uint8 type for further conversion into image object
+    compressed_image = rimg.astype(np.uint8)
+    
+    # # Showing the compressed image in graph
+    # plt.title("Image Name: "+imageToCompress+"\n")
+    # plt.imshow(compressed_image)
+    # plt.axis('off')
+    # plt.show()
+    
+    # Uncomment below code if you want to save your compressed image to the file
+    #compressed_image = Image.fromarray(compressed_image)
+    #compressed_image.save("image_name.jpg")
+    
+    return compressed_image
 
 # MAIN():
 # =============================================================================
@@ -86,7 +149,7 @@ deleteDirContents("./Images/Cropped_Die_Images/")
 deleteDirContents("./Images/Splitted_Cropped_Die_Images/Not_Likely_Defects/")
 deleteDirContents("./Images/Splitted_Cropped_Die_Images/Potential_Defects/")
 deleteDirContents("./Images/Failing_Dies_Overlayed_on_Wafer_Image")
-deleteDirContents("./Images/SVD_Cropped_Die_Images/")
+# deleteDirContents("./Images/SVD_Cropped_Die_Images/")
 
 # Load the first of each stitched- and golden-images
 fullImagePath = glob.glob(STICHED_IMAGES_DIRECTORY + "*")
@@ -177,6 +240,27 @@ for (x, y, window) in slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize)
                 # Gets cropped image and saves cropped image
                 croppedImage = window[win_y1:win_y2, win_x1:win_x2]
                 cv2.imwrite("./Images/Cropped_Die_Images/Row_{}-Col_{}.jpg".format(rowNum, colNum), croppedImage)
+                
+                # # # TESTING BELOW FOR SVD
+                # # TESTIG BELOW
+                # SVDImage = compressImage(croppedImage, 100)
+                # # croppedImage_Copy = croppedImage.copy()
+                # # # set blue and green channels to 0
+                # # r = croppedImage_Copy[:, :, 2]
+                
+                # # # Uses grayscale instead
+                # # g = cv2.cvtColor(croppedImage_Copy, cv2.COLOR_BGR2GRAY)
+                
+                # # # Actual SVD conversion part
+                # # U, s, V = np.linalg.svd(g)
+                # # num_components = 200
+                # # SVDImage = np.matrix(U[:, :num_components]) * np.diag(s[:num_components]) * np.matrix(V[:num_components, :])
+                # # croppedImage_Copy_Copy = croppedImage_Copy
+                # # croppedImage_Copy_Copy[:, :, 0] = 0
+                # # croppedImage_Copy_Copy[:, :, 1] = 0
+                # # croppedImage_Copy_Copy[:, :, 2] = SVDImage
+                
+                # cv2.imwrite("./Images/SVD_Cropped_Die_Images/Row_{}-Col_{}.jpg".format(rowNum, colNum), SVDImage)
                 
                 # TESTING BELOW
                 # SAVES CROPPED TO NEW FOLDER WITH CROP NAME

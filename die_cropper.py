@@ -2,13 +2,14 @@
 import os
 import glob
 import imutils
+# os.environ["OPENCV_IO_MAX_IMAGE_PIXELS"] = pow(2,110000).__str__()
 import cv2
 import time
 # TESTING SVD FROM NUMPY
 import numpy as np
 
 # User Parameters/Constants to Set
-MATCH_CL = 0.65 # Minimum confidence level (CL) required to match golden-image to scanned image
+MATCH_CL = 0.45 # Minimum confidence level (CL) required to match golden-image to scanned image
 SPLIT_MATCHES_CL =  0.83 # Splits MATCH_CL to SPLIT_MATCHES_CL (defects) to one folder, rest (no defects) other folder
 STICHED_IMAGES_DIRECTORY = "Images/Stitched_Images/"
 GOLDEN_IMAGES_DIRECTORY = "Images/Golden_Images/"
@@ -192,10 +193,10 @@ for (x, y, window) in slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize)
     
     # Draw rectangle over sliding window for debugging and easier visual
     displayImage = fullImage.copy()
-    cv2.rectangle(displayImage, (x, y), (x + winW, y + winH), (255, 0, 180), 20)
+    cv2.rectangle(displayImage, (x, y), (x + winW, y + winH), (255, 0, 180), 30)
     # TESTING BELOW
     # Add rect to failing area already saved
-    cv2.rectangle(displayImage, (BadX1, BadY1), (BadX2, BadY2), (0, 100, 255), 20)
+    cv2.rectangle(displayImage, (BadX1, BadY1), (BadX2, BadY2), (0, 100, 255), 30)
     displayImageResize = cv2.resize(displayImage, (round(fullImage.shape[1] / fullImage.shape[0] * 900), 900))
     cv2.imshow("Window", displayImageResize)
     cv2.waitKey(1)
@@ -304,7 +305,7 @@ for (x, y, window) in slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize)
             # Saves backup of fullImageClone before next rectangle write
             fullImageClone_Backup = fullImageClone.copy()
             # Add rect to failing area already saved
-            cv2.rectangle(fullImageClone, (BadX1, BadY1), (BadX2, BadY2), (0, 50, 255), 15)
+            cv2.rectangle(fullImageClone, (BadX1, BadY1), (BadX2, BadY2), (0, 50, 255), 25)
             prev_BadX1 = BadX1
             prev_BadY1 = BadY1
             prev_BadX2 = BadX2

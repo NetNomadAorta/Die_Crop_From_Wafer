@@ -2,7 +2,7 @@
 import os
 import glob
 import imutils
-# os.environ["OPENCV_IO_MAX_IMAGE_PIXELS"] = pow(2,110000).__str__()
+# os.environ["OPENCV_IO_MAX_IMAGE_PIXELS"] = pow(2,100000).__str__()
 import cv2
 import time
 # TESTING SVD FROM NUMPY
@@ -10,7 +10,7 @@ import numpy as np
 
 # User Parameters/Constants to Set
 MATCH_CL = 0.45 # Minimum confidence level (CL) required to match golden-image to scanned image
-SPLIT_MATCHES_CL =  0.83 # Splits MATCH_CL to SPLIT_MATCHES_CL (defects) to one folder, rest (no defects) other folder
+SPLIT_MATCHES_CL =  0.90 # Splits MATCH_CL to SPLIT_MATCHES_CL (defects) to one folder, rest (no defects) other folder
 STICHED_IMAGES_DIRECTORY = "Images/Stitched_Images/"
 GOLDEN_IMAGES_DIRECTORY = "Images/Golden_Images/"
 SLEEP_TIME = 0.0 # Time to sleep in seconds between each window step

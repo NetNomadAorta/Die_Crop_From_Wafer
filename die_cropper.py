@@ -143,7 +143,7 @@ def compressImage(imageToCompress, k):
 # MAIN():
 # =============================================================================
 # Clears some of the screen for asthetics
-print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+print("\n\n\n\n\n\n\n\n\n\n\n\n\n")
 
 # Deletes contents in cropped- and split-image folders
 deleteDirContents("./Images/Cropped_Die_Images/")

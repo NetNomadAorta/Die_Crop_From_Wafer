@@ -176,6 +176,7 @@ mainStitchDir = glob.glob(STICHED_IMAGES_DIRECTORY + "*")
 
 # Runs through each slot file within the main file within stitched-image folder
 for slotDir in glob.glob(mainStitchDir[0] + "/*"): 
+    print("Starting", slotDir, "\n")
 
     # Parameter set
     winW = round(goldenImage.shape[1] * 1.5) # Scales window width with full image resolution
@@ -221,7 +222,7 @@ for slotDir in glob.glob(mainStitchDir[0] + "/*"):
             # Add rect to failing area already saved
             cv2.rectangle(displayImage, (BadX1, BadY1), (BadX2, BadY2), (0, 100, 255), 40)
             displayImageResize = cv2.resize(displayImage, (1800, round(fullImage.shape[0] / fullImage.shape[1] * 1800)))
-            cv2.imshow(str(slotDir), displayImageResize) # TOGGLE TO SHOW OR NOT
+            # cv2.imshow(str(slotDir), displayImageResize) # TOGGLE TO SHOW OR NOT
             cv2.waitKey(1)
             time.sleep(SLEEP_TIME) # sleep time in ms after each window step
             
@@ -338,12 +339,12 @@ for slotDir in glob.glob(mainStitchDir[0] + "/*"):
                                 os.remove("./Images/Splitted_Cropped_Die_Images/Not_Likely_Defects/R{}{}-C{}{}-CL{}.jpg".format(rZ, rowNum, cZ, colNum, round(prev_matchedCL * 100)))
                                 os.remove("./Images/" + slotDir[23:-3] + "/" + \
                                 slotDir[-2:] + "/Splitted_Cropped_Die_Images/Not_Likely_Defects" +\
-                                "/R{}{}-C{}{}-CL{}.jpg".format(rZ, rowNum, cZ, colNum, round(matchedCL * 100)))
+                                "/R{}{}-C{}{}-CL{}.jpg".format(rZ, rowNum, cZ, colNum, round(prev_matchedCL * 100)))
                             if "R{}{}-C{}{}-CL{}.jpg".format(rZ, rowNum, cZ, colNum, round(prev_matchedCL * 100)) in os.listdir("./Images/Splitted_Cropped_Die_Images/Potential_Defects/"): 
                                 os.remove("./Images/Splitted_Cropped_Die_Images/Potential_Defects/R{}{}-C{}{}-CL{}.jpg".format(rZ, rowNum, cZ, colNum, round(prev_matchedCL * 100)))
                                 os.remove("./Images/" + slotDir[23:-3] + "/" + \
                                 slotDir[-2:] + "/Splitted_Cropped_Die_Images/Potential_Defects" +\
-                                "/R{}{}-C{}{}-CL{}.jpg".format(rZ, rowNum, cZ, colNum, round(matchedCL * 100)))
+                                "/R{}{}-C{}{}-CL{}.jpg".format(rZ, rowNum, cZ, colNum, round(prev_matchedCL * 100)))
                     
                     prev_y1 = y1
                     prev_x1 = x1

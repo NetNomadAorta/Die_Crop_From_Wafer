@@ -17,11 +17,11 @@ SLEEP_TIME = 0.0 # Time to sleep in seconds between each window step
 
 
 def time_convert(sec):
-  mins = sec // 60
-  sec = sec % 60
-  hours = mins // 60
-  mins = mins % 60
-  print("Time Lapsed = {0}h:{1}m:{2}s".format(int(hours) ,int(mins), round(sec)))
+    mins = sec // 60
+    sec = sec % 60
+    hours = mins // 60
+    mins = mins % 60
+    print("Time Lapsed = {0}h:{1}m:{2}s".format(int(hours), int(mins), round(sec) ) )
 
 
 def deleteDirContents(dir):
@@ -379,7 +379,11 @@ for slotDir in glob.glob(mainStitchDir[0] + "/*"):
         #     slotDir[-2:] + "/Failing_Dies_Overlayed_on_Wafer_Image" +\
         #     "/ImageWithBoxes.jpg", fullImageClone)
 
-# Starting stopwatch to see how long process takes
+
+
+print("Done!")
+
+# Stopping stopwatch to see how long process takes
 end_time = time.time()
 time_lapsed = end_time - start_time
 time_convert(time_lapsed)

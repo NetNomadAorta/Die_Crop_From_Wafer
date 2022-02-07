@@ -105,7 +105,7 @@ goldenImage = cv2.imread(goldenImagePath[0])
 # Parameter set
 winW = round(goldenImage.shape[1] * 1.5) # Scales window width with full image resolution
 # BELOW DEFAULT IS 1.5 CHANGE BACK IF NEEDED
-winH = round(goldenImage.shape[0] * 1.3) # Scales window height with full image resolution
+winH = round(goldenImage.shape[0] * 1.5) # Scales window height with full image resolution
 windowSize = (winW, winH)
 stepSizeX = round(winW / 2.95)
 stepSizeY = round(winH / 2.95)
@@ -170,12 +170,12 @@ for fullImagePath in glob.glob(STICHED_IMAGES_DIRECTORY + "*"):
                 y2 = y + win_y2
                 
                 # Makes sure same image does not get saved as different names
-                if y1 >= (prev_y1 + round(stepSizeY / 2.95)) or y1 <= (prev_y1 - round(stepSizeY / 2.95)):
+                if y1 >= (prev_y1 + round(goldenImage.shape[0] / 2.95)) or y1 <= (prev_y1 - round(goldenImage.shape[0] / 2.95)):
                     rowNum += 1
                     colNum = 1
                     sameCol = False
                 else:
-                    if x1 >= (prev_x1 + round(stepSizeX / 2.95)) or x1 <= (prev_x1 - round(stepSizeX / 2.95)):
+                    if x1 >= (prev_x1 + round(goldenImage.shape[1] / 2.95)) or x1 <= (prev_x1 - round(goldenImage.shape[1] / 2.95)):
                         colNum += 1
                         prev_matchedCL = 0
                         sameCol = False
@@ -200,7 +200,6 @@ for fullImagePath in glob.glob(STICHED_IMAGES_DIRECTORY + "*"):
                 if (sameCol == False) or (sameCol == True and matchedCL > prev_matchedCL): 
                     # Gets cropped image and saves cropped image
                     croppedImage = window[win_y1:win_y2, win_x1:win_x2]
-                    cv2.imwrite("./Images/Cropped_Die_Images/Row_{}{}-Col_{}{}.jpg".format(rZ, rowNum, cZ, colNum), croppedImage)
                     
                     # SAVES CROPPED TO NEW FOLDER WITH CROP NAME
                     cv2.imwrite("./Images/Cropped_Die_Images" +\
@@ -209,7 +208,8 @@ for fullImagePath in glob.glob(STICHED_IMAGES_DIRECTORY + "*"):
                 
                 prev_y1 = y1
                 prev_x1 = x1
-                prev_matchedCL = matchedCL
+                if sameCol == True and matchedCL > prev_matchedCL:
+                    prev_matchedCL = matchedCL
                 
                 # Draws orange boxes around bad dies
                 # Separate copy of resized full image with all bad dies showing orange boxes

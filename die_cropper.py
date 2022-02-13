@@ -13,7 +13,8 @@ MATCH_CL = 0.60 # Minimum confidence level (CL) required to match golden-image t
 SPLIT_MATCHES_CL =  0.98 # Splits MATCH_CL to SPLIT_MATCHES_CL (defects) to one folder, rest (no defects) other folder
 STICHED_IMAGES_DIRECTORY = "Images/Stitched_Images/"
 GOLDEN_IMAGES_DIRECTORY = "Images/Golden_Images/"
-SLEEP_TIME = 0.0 # Time to sleep in seconds between each window step
+SLEEP_TIME = 0.5 # Time to sleep in seconds between each window step
+SHOW_IMAGE_CROPPING = True
 
 
 def time_convert(sec):
@@ -148,7 +149,8 @@ for fullImagePath in glob.glob(STICHED_IMAGES_DIRECTORY + "*"):
         # Add rect to failing area already saved
         cv2.rectangle(displayImage, (BadX1, BadY1), (BadX2, BadY2), (0, 100, 255), 10)
         displayImageResize = cv2.resize(displayImage, (1000, round(fullImage.shape[0] / fullImage.shape[1] * 1000)))
-        cv2.imshow(str(fullImagePath), displayImageResize) # TOGGLE TO SHOW OR NOT
+        if SHOW_IMAGE_CROPPING:
+            cv2.imshow(str(fullImagePath), displayImageResize) # TOGGLE TO SHOW OR NOT
         cv2.waitKey(1)
         time.sleep(SLEEP_TIME) # sleep time in ms after each window step
         
@@ -170,12 +172,14 @@ for fullImagePath in glob.glob(STICHED_IMAGES_DIRECTORY + "*"):
                 y2 = y + win_y2
                 
                 # Makes sure same image does not get saved as different names
-                if y1 >= (prev_y1 + round(goldenImage.shape[0] / 2.95)) or y1 <= (prev_y1 - round(goldenImage.shape[0] / 2.95)):
+                if (y1 >= (prev_y1 + round(goldenImage.shape[0] * .9) ) 
+                    or y1 <= (prev_y1 - round(goldenImage.shape[0] * .9) ) ):
                     rowNum += 1
                     colNum = 1
+                    prev_matchedCL = 0
                     sameCol = False
                 else:
-                    if x1 >= (prev_x1 + round(goldenImage.shape[1] / 2.95)) or x1 <= (prev_x1 - round(goldenImage.shape[1] / 2.95)):
+                    if x1 >= (prev_x1 + round(goldenImage.shape[1] * .9) ):
                         colNum += 1
                         prev_matchedCL = 0
                         sameCol = False
@@ -204,12 +208,17 @@ for fullImagePath in glob.glob(STICHED_IMAGES_DIRECTORY + "*"):
                     # SAVES CROPPED TO NEW FOLDER WITH CROP NAME
                     cv2.imwrite("./Images/Cropped_Die_Images" +\
                         "/Row_{}{}-Col_{}{}.jpg".format(rZ, rowNum, cZ, colNum), croppedImage)
-                    
                 
-                prev_y1 = y1
-                prev_x1 = x1
-                if sameCol == True and matchedCL > prev_matchedCL:
+                if sameCol == False: 
+                    prev_y1 = y1
+                    prev_x1 = x1
                     prev_matchedCL = matchedCL
+                    
+                elif sameCol == True and matchedCL > prev_matchedCL:
+                    prev_y1 = y1
+                    prev_x1 = x1
+                    prev_matchedCL = matchedCL
+                
                 
                 # Draws orange boxes around bad dies
                 # Separate copy of resized full image with all bad dies showing orange boxes

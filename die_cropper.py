@@ -59,6 +59,10 @@ def slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize):
     # Slides a window across the stitched-image
     for y in range(0, fullImage.shape[0], stepSizeY):
         for x in range(0, fullImage.shape[1], stepSizeX):
+            if (y + windowSize[1]) > fullImage.shape[0]:
+                y = fullImage.shape[0] - windowSize[1]
+            if (x + windowSize[0]) > fullImage.shape[1]:
+                x = fullImage.shape[1] - windowSize[0]
             # Yield the current window
             yield (x, y, fullImage[y:y + windowSize[1], x:x + windowSize[0]])
 
